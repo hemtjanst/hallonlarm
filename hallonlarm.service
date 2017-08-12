@@ -1,0 +1,9 @@
+[Unit]
+Description=HallonLarm - Gpio to MQTT bridge
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/local/bin/hallonlarm
+
+[Install]
+WantedBy=multi-user.target
