@@ -32,10 +32,6 @@ func main() {
 		log.Fatal("Unable to parse config: ", err)
 	}
 
-	if cfg.Mqtt != nil {
-		cfg.Mqtt.Enforce()
-	}
-
 	/*
 	  Set up and start MQTT connection
 	*/

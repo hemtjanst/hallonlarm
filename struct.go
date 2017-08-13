@@ -2,13 +2,11 @@ package main
 
 import (
 	"github.com/hemtjanst/hemtjanst/device"
-	"github.com/hemtjanst/hemtjanst/messaging/flagmqtt"
 )
 
 // Config is the basic struct for the HCL parser, it has a map of devices and a mqtt config
 type Config struct {
 	Device map[string]*DeviceConfig `json:"device"`
-	Mqtt   *flagmqtt.MqttConfig
 }
 
 // DeviceConfig contains meta-data for a device and it's features
