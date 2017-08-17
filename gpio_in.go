@@ -17,7 +17,7 @@ type GpioReader struct {
 	C                chan bool
 	config           GpioReaderCfg
 	lastState        rpio.State
-	reported         bool
+	reported         rpio.State
 	consecutiveReads int64
 	stopChan         chan bool
 }
@@ -37,7 +37,7 @@ func NewGpioReader(c GpioReaderCfg) *GpioReader {
 		C:                make(chan bool, 32),
 		config:           c,
 		lastState:        2,
-		reported:         false,
+		reported:         2,
 		consecutiveReads: 0,
 		stopChan:         make(chan bool, 1),
 	}
@@ -58,6 +58,7 @@ func (g *GpioReader) Start() {
 	}
 
 	tick := time.NewTicker(time.Millisecond * time.Duration(g.config.ReadInterval))
+	log.Printf("[gpioIn:%d] Starting ticker running every %dms", g.config.Pin, g.config.ReadInterval)
 
 	for {
 		state := pin.Read()
@@ -65,9 +66,9 @@ func (g *GpioReader) Start() {
 		case g.lastState:
 			g.consecutiveReads++
 		default:
+			log.Printf("[gpioIn:%d] Got new state: %d", g.config.Pin, state)
 			g.lastState = state
 			g.consecutiveReads = 1
-			g.reported = false
 		}
 
 		minConsecutive := g.config.MinReadClosed
@@ -75,11 +76,12 @@ func (g *GpioReader) Start() {
 			minConsecutive = g.config.MinReadOpened
 		}
 
-		if !g.reported && g.consecutiveReads >= minConsecutive {
+		if g.reported != g.lastState && g.consecutiveReads >= minConsecutive {
+			log.Printf("[gpioIn:%d] Got %d consecutive reads, reporting %b", g.config.Pin, g.consecutiveReads, state == openValue)
 			if g.C != nil {
 				g.C <- state == openValue
 			}
-			g.reported = true
+			g.reported = g.lastState
 		}
 
 		select {

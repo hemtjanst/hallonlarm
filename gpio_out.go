@@ -2,6 +2,7 @@ package main
 
 import (
 	rpio "github.com/stianeikeland/go-rpio"
+	"log"
 )
 
 // GpioWriter
@@ -38,8 +39,10 @@ func (g *GpioWriter) Start() {
 			return
 		case st := <-g.C:
 			if st == g.config.Invert {
+				log.Printf("[gpioOut:%d] Setting pin to high", g.config.Pin)
 				pin.High()
 			} else {
+				log.Printf("[gpioOut:%d] Setting pin to low", g.config.Pin)
 				pin.Low()
 			}
 		}

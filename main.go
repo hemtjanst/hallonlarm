@@ -91,8 +91,10 @@ func main() {
 	}
 
 	m.Subscribe("discover", 1, func(message messaging.Message) {
+		log.Printf("Got discover, publishing announce")
 		for topic, _ := range cfg.Device {
 			m.Publish("announce", []byte(topic), 1, false)
+			log.Printf("[annnounce] %s", topic)
 		}
 	})
 
