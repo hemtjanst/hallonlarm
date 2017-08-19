@@ -52,6 +52,7 @@ func main() {
 	/*
 	  Loop through configured devices and set up
 	*/
+	var devices []*device.Device
 	for topic, dev := range cfg.Device {
 
 		md := device.NewDevice(topic, m)
@@ -61,13 +62,11 @@ func main() {
 		md.Model = dev.Model
 		md.SerialNumber = dev.SerialNumber
 
-		features := map[string]*device.Feature{}
-
 		for name, ft := range dev.Feature {
 			if ft.Info == nil {
 				ft.Info = &device.Feature{}
 			}
-			features[name] = ft.Info
+			md.AddFeature(name, ft.Info)
 			if ft.GpioIn != nil && ft.GpioIn.Pin > 0 {
 				reader := NewGpioReader(*ft.GpioIn)
 				go gpioInReporter(md, name, reader.C)
@@ -75,26 +74,24 @@ func main() {
 			}
 			if ft.GpioOut != nil && ft.GpioOut.Pin > 0 {
 				writer := NewGpioWriter(*ft.GpioOut)
-				ftName := name
-				md.OnSet(ftName, func(msg messaging.Message) {
+				ftr, _ := md.GetFeature(name)
+				ftr.OnSet(func(msg messaging.Message) {
 					pl := string(msg.Payload())
 					writer.C <- pl == "1" || strings.ToLower(pl) == "true"
 					// Write the value to back to the get topic to acknowledge
-					md.Update(ftName, pl)
+					ftr.Update(pl)
 				})
 				go writer.Start()
 			}
 		}
 
-		md.Features = features
-		md.PublishMeta()
+		devices = append(devices, md)
 	}
 
 	m.Subscribe("discover", 1, func(message messaging.Message) {
 		log.Printf("Got discover, publishing announce")
-		for topic, _ := range cfg.Device {
-			m.Publish("announce", []byte(topic), 1, false)
-			log.Printf("[annnounce] %s", topic)
+		for _, d := range devices {
+			d.PublishMeta()
 		}
 	})
 
@@ -112,6 +109,7 @@ func gpioInReporter(d *device.Device, n string, ch chan bool) {
 		if st {
 			val = "1"
 		}
-		d.Update(n, val)
+		ft, _ := d.GetFeature(n)
+		ft.Update(val)
 	}
 }

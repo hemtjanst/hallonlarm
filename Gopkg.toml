@@ -1,0 +1,11 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/hashicorp/hcl"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/hemtjanst/hemtjanst"
+
+[[constraint]]
+  name = "github.com/stianeikeland/go-rpio"
+  version = "3.0.0"
