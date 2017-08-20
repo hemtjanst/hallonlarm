@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	mq "github.com/eclipse/paho.mqtt.golang"
 	"github.com/hashicorp/hcl"
 	"github.com/hemtjanst/hemtjanst/device"
 	"github.com/hemtjanst/hemtjanst/messaging"
@@ -18,6 +19,10 @@ var (
 	cfgFileFlag = flag.String("hl.config", "/etc/hallonlarm.conf", "Configuration file for HallonLarm")
 )
 
+type handler struct {
+	devices []*device.Device
+}
+
 func main() {
 
 	flag.Parse()
@@ -33,26 +38,26 @@ func main() {
 	}
 
 	/*
-	  Set up and start MQTT connection
+		Set up MQTT client
 	*/
 	id := flagmqtt.NewUniqueIdentifier()
+	h := &handler{
+		devices: []*device.Device{},
+	}
 
 	mq, err := flagmqtt.NewPersistentMqtt(flagmqtt.ClientConfig{
-		ClientID:    id,
-		WillTopic:   "leave",
-		WillPayload: id,
+		ClientID:         id,
+		WillTopic:        "leave",
+		WillPayload:      id,
+		OnConnectHandler: h.onConnectHandler,
 	})
-
-	if tok := mq.Connect(); tok.Wait() && tok.Error() != nil {
-		log.Fatal("Failed to connect to broker: ", err)
-	}
 
 	m := messaging.NewMQTTMessenger(mq)
 
 	/*
-	  Loop through configured devices and set up
+		Loop through configured devices and set up
 	*/
-	var devices []*device.Device
+
 	for topic, dev := range cfg.Device {
 
 		md := device.NewDevice(topic, m)
@@ -85,15 +90,16 @@ func main() {
 			}
 		}
 
-		devices = append(devices, md)
+		h.devices = append(h.devices, md)
 	}
 
-	m.Subscribe("discover", 1, func(message messaging.Message) {
-		log.Printf("Got discover, publishing announce")
-		for _, d := range devices {
-			d.PublishMeta()
-		}
-	})
+	/*
+		Connect to MQTT
+	*/
+
+	if tok := mq.Connect(); tok.Wait() && tok.Error() != nil {
+		log.Fatal("Failed to connect to broker: ", err)
+	}
 
 	quit := make(chan os.Signal, 2)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
@@ -112,4 +118,15 @@ func gpioInReporter(d *device.Device, n string, ch chan bool) {
 		}
 		ft.Update(val)
 	}
+}
+
+func (h *handler) onConnectHandler(c mq.Client) {
+	log.Print("Connected to MQTT broker")
+	c.Subscribe("discover", 1, func(mq.Client, mq.Message) {
+		log.Printf("Got discover, publishing announce")
+		for _, d := range h.devices {
+			d.PublishMeta()
+			log.Print("Published meta for ", d.Topic)
+		}
+	})
 }

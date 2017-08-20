@@ -17,7 +17,7 @@
   branch = "master"
   name = "github.com/hemtjanst/hemtjanst"
   packages = ["device","messaging","messaging/flagmqtt"]
-  revision = "48abf33494e7cf90ffaa58fb3c71376805dee427"
+  revision = "5ff4d78e7ff0af5bf0ccdde0858ed336a70e7843"
 
 [[projects]]
   name = "github.com/satori/go.uuid"
@@ -40,6 +40,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "213099a7e9915dbc939c5ee6edd3bda76ab4e4b2c6524ba49e42eea15c34d447"
+  inputs-digest = "6df81ceed98c6d4f50af1e808bf5a5ff4063a5fab182ea5fba26aa1da3bbaac9"
   solver-name = "gps-cdcl"
   solver-version = 1
