@@ -3,7 +3,7 @@ Description=HallonLarm - Gpio to MQTT bridge
 After=multi-user.target
 
 [Service]
-ExecStart=/usr/local/bin/hallonlarm
+ExecStart=/usr/local/bin/hallonlarm -mqtt.address=localhost:1883
 
 [Install]
 WantedBy=multi-user.target

@@ -23,6 +23,11 @@ sudo cp hallonlarm_armv[67] /usr/local/bin/hallonlarm
 
 # Install the unit file
 sudo cp hallonlarm.service /etc/systemd/system/
+
+# Edit the unit file to change mqtt address
+sudo vim /etc/systemd/hallonlarm.service
+
+# Reload systemd
 sudo systemctl daemon-reload
 
 # Copy and edit the sample configuration
@@ -44,9 +49,6 @@ This can be changed by adding the argument `-hl.config path/to/hallonlarm.conf` 
 
 A minimal configuration looks like this (the configuration language is [HCL](https://github.com/hashicorp/hcl):
 ```HCL
-mqtt {
-    address = "localhost:1883"
-}
 device "sensor/contact/bedroom_window" {
   name = "Bedroom Window"
   type = "contactSensor"

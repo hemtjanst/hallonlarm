@@ -103,13 +103,13 @@ func main() {
 }
 
 func gpioInReporter(d *device.Device, n string, ch chan bool) {
+	ft, _ := d.GetFeature(n)
 	for {
 		st := <-ch
 		val := "0"
 		if st {
 			val = "1"
 		}
-		ft, _ := d.GetFeature(n)
 		ft.Update(val)
 	}
 }
