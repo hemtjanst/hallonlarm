@@ -1,6 +1,6 @@
 builds:
   - binary: hallonlarm
-    main: ./main.go
+    main: .
     goos:
       - windows
       - darwin
