@@ -2,11 +2,8 @@ builds:
   - binary: hallonlarm
     main: .
     goos:
-      - windows
-      - darwin
       - linux
     goarch:
-      - amd64
       - arm
     goarm:
       - 6
