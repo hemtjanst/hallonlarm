@@ -12,6 +12,10 @@ HallonLarm is:
 Build and install HallonLarm:
 
 ```bash
+# Install dep and dependencies
+go get -u github.com/golang/dep/cmd/dep
+dep ensure
+
 # Build for ARMv6, Raspberry Pi 1-2:
 env GOOS=linux GOARCH=arm GOARM=6 go build -o hallonlarm_armv6 .
 
