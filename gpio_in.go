@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	rpio "github.com/stianeikeland/go-rpio"
 	"log"
 	"time"
@@ -19,7 +20,6 @@ type GpioReader struct {
 	lastState        rpio.State
 	reported         rpio.State
 	consecutiveReads int64
-	stopChan         chan bool
 }
 
 // NewGpioReader takes a configuration value and returns a GpioReader instance
@@ -39,16 +39,12 @@ func NewGpioReader(c GpioReaderCfg) *GpioReader {
 		lastState:        2,
 		reported:         2,
 		consecutiveReads: 0,
-		stopChan:         make(chan bool, 1),
 	}
 	return g
 }
 
-func (g *GpioReader) Stop() {
-	g.stopChan <- true
-}
-
-func (g *GpioReader) Start() {
+func (g *GpioReader) Start(ctx context.Context) {
+	defer close(g.C)
 	pin := rpio.Pin(g.config.Pin)
 	pin.Input()
 
@@ -85,7 +81,7 @@ func (g *GpioReader) Start() {
 		}
 
 		select {
-		case <-g.stopChan:
+		case <-ctx.Done():
 			return
 		case <-tick.C:
 			continue

@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"syscall"
 )
 
@@ -19,6 +20,7 @@ var (
 )
 
 func main() {
+	wg := sync.WaitGroup{}
 	mCfg := mqtt.MustFlags(flag.String, flag.Bool)
 	flag.Parse()
 
@@ -63,8 +65,16 @@ func main() {
 			ftr := md.Feature(name)
 			if ft.GpioIn != nil && ft.GpioIn.Pin > 0 {
 				reader := NewGpioReader(*ft.GpioIn)
-				go gpioInReporter(ftr, reader.C)
-				go reader.Start()
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					gpioInReporter(ftr, reader.C)
+				}()
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					reader.Start(ctx)
+				}()
 			}
 			if ft.GpioOut != nil && ft.GpioOut.Pin > 0 {
 				writer := NewGpioWriter(*ft.GpioOut)
@@ -77,19 +87,26 @@ func main() {
 					log.Printf("Unable to subscribe to feature %s -> %s: %s", topic, name, err)
 					continue
 				}
-				go writer.Start()
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					writer.Start(ctx)
+				}()
 			}
 		}
 
 	}
 
-	<-ctx.Done()
+	wg.Wait()
 
 }
 
 func gpioInReporter(ft client.Feature, ch chan bool) {
 	for {
-		st := <-ch
+		st, open := <-ch
+		if !open {
+			return
+		}
 		val := "0"
 		if st {
 			val = "1"
