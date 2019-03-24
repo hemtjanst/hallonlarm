@@ -9,10 +9,8 @@ jobs:
     - go: master
   include:
     - stage: test
-      go: 1.9.x
-      before_install:
-        - go get -u github.com/golang/dep/cmd/dep
-      install: dep ensure
+      go: 1.12.x
+      install: go mod vendor
       script: go test -race -v $(go list ./... | grep -v /vendor/) 
       after_success:
         - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash
