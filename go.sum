@@ -37,6 +37,8 @@ github.com/hemtjanst/bibliotek v0.3.0 h1:RkAmmJykOZFFNPisyo/DjM8ADT3d9GeqvGt51VC
 github.com/hemtjanst/bibliotek v0.3.0/go.mod h1:pnVSYPLDWn18X/NVPIQMhP8+pTPdi43IaQe8HF4MNDI=
 github.com/hemtjanst/bibliotek v0.3.1-0.20190324203522-6e6c1ecb6c04 h1:4ZVf0bWmeagyRFjIMPehWZ+Wibsyrm+oOSaei5BIm74=
 github.com/hemtjanst/bibliotek v0.3.1-0.20190324203522-6e6c1ecb6c04/go.mod h1:pnVSYPLDWn18X/NVPIQMhP8+pTPdi43IaQe8HF4MNDI=
+github.com/hemtjanst/bibliotek v0.3.1-0.20190324205902-7b99acd888ea h1:kf4kk+XFD8GXVXrqrjAUcIypXfQKZjfkKwSPxdbU9hQ=
+github.com/hemtjanst/bibliotek v0.3.1-0.20190324205902-7b99acd888ea/go.mod h1:pnVSYPLDWn18X/NVPIQMhP8+pTPdi43IaQe8HF4MNDI=
 github.com/hemtjanst/hemtjanst v0.0.0-20170830154223-242d1a706c19 h1:+f6x7J1CANeOudeI4qo0tBHMaSM082yMPiywOF7Uo/8=
 github.com/hemtjanst/hemtjanst v0.0.0-20170830154223-242d1a706c19/go.mod h1:Ypc8d852NNze3y/7JHDg9dXnkvaXwrFOCAmzhSLsyTc=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
