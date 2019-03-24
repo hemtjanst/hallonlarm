@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/hemtjanst/hemtjanst/device"
+	"github.com/hemtjanst/bibliotek/device"
+	"github.com/hemtjanst/bibliotek/feature"
 )
 
 // Config is the basic struct for the HCL parser, it has a map of devices and a mqtt config
@@ -12,24 +13,44 @@ type Config struct {
 // DeviceConfig contains meta-data for a device and it's features
 type DeviceConfig struct {
 	// Name as exposed to Hemtjänst/homekit, required
-	Name         string                    `json:"name"`
+	Name string `json:"name"`
 	// Manufacturer as exposed to Hemtjänst, optional
-	Manufacturer string                    `json:"manufacturer"`
+	Manufacturer string `json:"manufacturer"`
 	// Model as exposed to Hemtjänst, optional
-	Model        string                    `json:"model"`
+	Model string `json:"model"`
 	// SerialNumber as exposed to Hemtjänst, optional
-	SerialNumber string                    `json:"serialNumber"`
+	SerialNumber string `json:"serialNumber"`
 	// Type must be a valid homekit type, see Hemtjänst documentation for valid types
-	Type         string                    `json:"type"`
-	Feature      map[string]*DeviceFeature `json:"feature"`
+	Type    string                    `json:"type"`
+	Feature map[string]*DeviceFeature `json:"feature"`
+}
+
+func (d *DeviceConfig) DeviceInfo(topic string) *device.Info {
+	i := &device.Info{
+		Topic:        topic,
+		Name:         d.Name,
+		Type:         d.Type,
+		Manufacturer: d.Manufacturer,
+		Model:        d.Model,
+		SerialNumber: d.SerialNumber,
+		Features:     map[string]*feature.Info{},
+	}
+	for name, ft := range d.Feature {
+		if ft.Info == nil {
+			ft.Info = &feature.Info{}
+		}
+		i.Features[name] = ft.Info
+	}
+
+	return i
 }
 
 // DeviceFeature reflects a homekit characteristic
 type DeviceFeature struct {
 	// Info contains hemtjänst-specific settings like what topics to use and what the min/max/step values are
-	Info    *device.Feature
+	Info *feature.Info
 	// GpioIn is the configuration for reading from GPIO to MQTT
-	GpioIn  *GpioReaderCfg `json:"gpioIn"`
+	GpioIn *GpioReaderCfg `json:"gpioIn"`
 	// GpioOut is the configuration for writing to GPIO from MQTT
 	GpioOut *GpioWriterCfg `json:"gpioOut"`
 }
