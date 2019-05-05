@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hemtjanst/bibliotek/device"
-	"github.com/hemtjanst/bibliotek/feature"
+	"lib.hemtjan.st/device"
+	"lib.hemtjan.st/feature"
 )
 
 // Config is the basic struct for the HCL parser, it has a map of devices and a mqtt config
